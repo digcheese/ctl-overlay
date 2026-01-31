@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import LeagueStats from './LeagueStats';
+import { fetchProxied } from '../util/fetchProxied';
 
 const PlayerIcon = (props) => {
   const [avatarUrl, setAvatarUrl] = useState(null);
@@ -9,10 +10,8 @@ const PlayerIcon = (props) => {
       if (!props.username)
         return;
 
-      const leagueResponse = await fetch(`https://corsproxy.io/?url=https://ch.tetr.io/api/users/${props.username.toLowerCase()}/summaries/league`);
-      const userResponse = await fetch(`https://corsproxy.io/?url=https://ch.tetr.io/api/users/${props.username.toLowerCase()}`);
-      const leagueRes = await leagueResponse.json();
-      const userRes = await userResponse.json();
+      const leagueRes = await fetchProxied(`https://ch.tetr.io/api/users/${props.username.toLowerCase()}/summaries/league`);
+      const userRes = await fetchProxied(`https://ch.tetr.io/api/users/${props.username.toLowerCase()}`);
       if (!leagueRes.success || !userRes.success) {
         setAvatarUrl(null);
         return;
@@ -45,18 +44,7 @@ const PlayerIcon = (props) => {
         <img className="player-icon-img" alt="icon" src={avatarUrl} style={{ borderColor: teamColor, opacity: props.eliminated ? 0.3 : 1 }} /> :
         <div className="player-icon-img" style={{ borderColor: teamColor }}></div>
       }
-      {/*<svg
-        width="100%"
-        height="100%"
-        viewBox="0 0 500 75"
-        preserveAspectRatio="xMinYMid meet"
-      >
-        <text
-          x="50%" y="50%" dominantBaseline="middle" textAnchor="middle" fontSize="75" fontWeight={"bold"}
-          fill={teamColor}
-        >{props.username}</text>
-      </svg>*/}
-      <div class="label" style={{ opacity: props.eliminated ? 0.6 : 1 }}>
+      <div className="label" style={{ opacity: props.eliminated ? 0.6 : 1 }}>
         <svg
           width="200%"
           height="200%"

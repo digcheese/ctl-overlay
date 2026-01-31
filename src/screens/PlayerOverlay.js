@@ -142,7 +142,7 @@ const PlayerOverlay = () => {
             <PlayerIcon
               teamColor={teamColors[teamIndex]}
               username={player.name}
-
+              key={playerIndex}
               pos={playerPositions[teamIndex][playerIndex]}
               selected={selectedPlayerIndices[teamIndex] === playerIndex && scene === "players-chosen"}
               eliminated={player.eliminated}
