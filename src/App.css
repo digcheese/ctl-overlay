@@ -1,17 +1,17 @@
 @font-face {
   font-family: 'C';
   font-weight: 500;
-  src: url('https://corsproxy.io/?url=https://ch.tetr.io/res/font/cr.ttf');
+  src: url('https://cors.io/?url=https://ch.tetr.io/res/font/cr.ttf');
 }
 
 @font-face {
   font-family: 'C';
   font-weight: 900;
-  src: url('https://corsproxy.io/?url=https://ch.tetr.io/res/font/cb.ttf');
+  src: url('https://cors.io/?url=https://ch.tetr.io/res/font/cb.ttf');
 }
 
 @font-face {
-  src: url('https://corsproxy.io/?url=https://ch.tetr.io/res/font/hun2.ttf?v=6');
+  src: url('https://cors.io/?url=https://ch.tetr.io/res/font/hun2.ttf?v=6');
   font-family: 'HUN';
 }
 
