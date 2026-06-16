@@ -10,8 +10,6 @@
     "socket.io-client": "^4.5.4"
   },
   "scripts": {
-    "predeploy": "npm run build",
-    "deploy": "gh-pages -d dist",
     "start": "vite",
     "build": "vite build",
     "serve": "vite preview"
