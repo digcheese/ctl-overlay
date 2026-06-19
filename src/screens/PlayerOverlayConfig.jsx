@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react"
+import { isAbsentPlayer } from '../util/playerUtils';
 
 const PlayerOverlayConfig = () => {
 
@@ -50,6 +51,10 @@ const PlayerOverlayConfig = () => {
     const newTeamColors = [...teamColors];
     newTeamColors[teamIndex] = color;
     setTeamColors(newTeamColors)
+  }
+
+  const getActivePlayers = (teamIndex) => {
+    playerData[teamIndex].filter(player => !isAbsent(player));
   }
 
   const saveToLocalStorage = () => {

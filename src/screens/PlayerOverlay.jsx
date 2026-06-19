@@ -2,12 +2,13 @@ import { useState, useEffect } from 'react'
 import PlayerIcon from '../components/PlayerIcon';
 import Positions from '../config/Positions'
 import { useInterval } from '../hooks/useInterval';
+import { isAbsentPlayer } from '../util/playerUtils';
 
 const PlayerOverlay = () => {
   const [playerData, setPlayerData] = useState([[{}, {}, {}, {}, {}], [{}, {}, {}, {}, {}]]);
   const [selectedPlayerIndices, setSelectedPlayerIndices] = useState([-1, -1]);
   const [teamColors, setTeamColors] = useState(["", ""]);
-  const [playerPositions, setPlayerPositions] = useState(Positions.DEFAULT_POSITIONS);
+  const [playerPositions, setPlayerPositions] = useState(Positions.ALL_HIDDEN_GAME_POSITIONS);
   const [scene, setScene] = useState("");
 
   var int = useInterval(() => {
@@ -64,28 +65,43 @@ const PlayerOverlay = () => {
     }
   }, [selectedPlayerIndices]);
 
+  // Lays out all non-absent players evenly, absent players get null (not rendered).
+  const buildSpacedPositions = (players, teamIndex, computeCoords) => {
+    const activePlayers = players.filter(p => !isAbsentPlayer(p));
+    const coords = computeCoords(activePlayers.length, teamIndex);
+    let coordIndex = 0;
+    return players.map(p => isAbsentPlayer(p) ? null : coords[coordIndex++]);
+  };
+
+  // Same, but pulls one player out as "focused" and spaces the rest as bench.
+  const buildFocusedPositions = (players, teamIndex, selectedIndex, computeBenchCoords, focusedPosition) => {
+    const benchCount = players.filter((p, i) => !isAbsentPlayer(p) && i !== selectedIndex).length;
+    const benchCoords = computeBenchCoords(benchCount, teamIndex);
+    let benchIndex = 0;
+    return players.map((p, i) => {
+      if (isAbsentPlayer(p)) return null;
+      if (i === selectedIndex) return focusedPosition;
+      return benchCoords[benchIndex++];
+    });
+  };
+
   const transitionToSelectedPlayerScene = force => {
     if (scene === "players-chosen" && !force) {
       return;
     }
     setScene(scene => "players-chosen");
-    const newPlayerPositions = [];
-    for (var teamIndex = 0; teamIndex < playerData.length; teamIndex++) {
+    const newPlayerPositions = playerData.map((players, teamIndex) => {
       if (selectedPlayerIndices[teamIndex] < 0 || selectedPlayerIndices[teamIndex] >= 5) {
-        newPlayerPositions.push(Positions.DEFAULT_POSITIONS[teamIndex]);
-        continue;
+        return buildSpacedPositions(players, teamIndex, Positions.defaultPositions);
       }
-      newPlayerPositions.push([]);
-      var benchIndex = 0;
-      for (var playerIndex = 0; playerIndex < playerData[teamIndex].length; playerIndex++) {
-        if (playerIndex === selectedPlayerIndices[teamIndex]) {
-          newPlayerPositions[teamIndex].push(Positions.FOCUSED_PLAYER_SELECTED_POSITIONS[teamIndex]);
-        } else {
-          newPlayerPositions[teamIndex].push(Positions.BENCH_PLAYER_SELECTED_POSITIONS[teamIndex][benchIndex]);
-          benchIndex++;
-        }
-      }
-    }
+      return buildFocusedPositions(
+        players,
+        teamIndex,
+        selectedPlayerIndices[teamIndex],
+        Positions.benchPositionsSelected,
+        Positions.FOCUSED_PLAYER_SELECTED_POSITIONS[teamIndex]
+      );
+    });
     setPlayerPositions(newPlayerPositions);
     console.log("transitioning to player chosen screen")
   }
@@ -94,7 +110,10 @@ const PlayerOverlay = () => {
       return;
     }
     setScene(scene => "player-select");
-    setPlayerPositions(Positions.DEFAULT_POSITIONS);
+    const newPlayerPositions = playerData.map((players, teamIndex) =>
+      buildSpacedPositions(players, teamIndex, Positions.defaultPositions)
+    );
+    setPlayerPositions(newPlayerPositions);
     console.log("transitioning to player select screen")
   }
 
@@ -112,24 +131,18 @@ const PlayerOverlay = () => {
       return;
     }
     setScene(scene => "game-scene");
-    const newPlayerPositions = [];
-    for (var teamIndex = 0; teamIndex < playerData.length; teamIndex++) {
+    const newPlayerPositions = playerData.map((players, teamIndex) => {
       if (selectedPlayerIndices[teamIndex] < 0 || selectedPlayerIndices[teamIndex] >= 5) {
-        newPlayerPositions.push(Positions.ALL_HIDDEN_GAME_POSITIONS[teamIndex]);
-        continue;
+        return Positions.ALL_HIDDEN_GAME_POSITIONS[teamIndex];
       }
-      newPlayerPositions.push([]);
-      var benchIndex = 0;
-      for (var playerIndex = 0; playerIndex < playerData[teamIndex].length; playerIndex++) {
-        if (playerIndex === selectedPlayerIndices[teamIndex]) {
-          newPlayerPositions[teamIndex].push(Positions.FOCUSED_PLAYER_GAME_POSITIONS[teamIndex]);
-        } else {
-          newPlayerPositions[teamIndex].push(Positions.BENCH_PLAYER_GAME_POSITIONS[teamIndex][benchIndex]);
-          benchIndex++;
-        }
-      }
-    }
-
+      return buildFocusedPositions(
+        players,
+        teamIndex,
+        selectedPlayerIndices[teamIndex],
+        Positions.benchPositionsGame,
+        Positions.FOCUSED_PLAYER_GAME_POSITIONS[teamIndex]
+      );
+    });
     console.log('transitioning to game scene');
     setPlayerPositions(newPlayerPositions);
   }
@@ -138,17 +151,22 @@ const PlayerOverlay = () => {
     <div>
       <main>
         {playerData.map((team, teamIndex) =>
-          team.map((player, playerIndex) =>
-            <PlayerIcon
-              teamColor={teamColors[teamIndex]}
-              username={player.name}
-              key={playerIndex}
-              pos={playerPositions[teamIndex][playerIndex]}
-              selected={selectedPlayerIndices[teamIndex] === playerIndex && scene === "players-chosen"}
-              eliminated={player.eliminated}
-              blurb={player.blurb}
-            />
-          )
+          team.map((player, playerIndex) => {
+            if (isAbsentPlayer(player)) {
+              return null;
+            }
+            return (
+              <PlayerIcon
+                teamColor={teamColors[teamIndex]}
+                username={player.name}
+                key={playerIndex}
+                pos={playerPositions[teamIndex][playerIndex]}
+                selected={selectedPlayerIndices[teamIndex] === playerIndex && scene === "players-chosen"}
+                eliminated={player.eliminated}
+                blurb={player.blurb}
+              />
+            );
+          })
         )}
       </main>
       {/* Testing buttons that should be off screen. */}
