@@ -5,5 +5,9 @@ import tsconfigPaths from 'vite-tsconfig-paths'
 
 export default defineConfig({
   base: '/ctl-overlay/',
-  plugins: [react(), svgr(), tsconfigPaths()]
+  plugins: [react(), svgr(), tsconfigPaths()],
+  server: {
+    host: true,
+    port: 3000,
+  },
 })
