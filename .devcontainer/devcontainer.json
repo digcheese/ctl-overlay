@@ -1,0 +1,29 @@
+{
+	"name": "ctl-overlay",
+	"build": {
+		"dockerfile": "Dockerfile"
+	},
+	"runArgs": [
+		"--privileged"
+	],
+    "forwardPorts": [3000],
+    "portsAttributes": {
+        "3000": {
+            "label": "ctl-overlay",
+            "onAutoForward": "notify"
+        }
+    },
+	// Configure VS Code in the dev container
+	"customizations": {
+		"vscode": {
+			"settings": {
+				"terminal.integrated.shell.linux": "/bin/bash",
+				"workbench.colorTheme": "Visual Studio Dark"
+			},
+			"extensions": [
+				"dbaeumer.vscode-eslint"
+			]
+		}
+	},
+	"userEnvProbe": "loginInteractiveShell"
+}
