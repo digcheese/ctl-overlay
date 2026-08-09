@@ -25,5 +25,6 @@
 			]
 		}
 	},
-	"userEnvProbe": "loginInteractiveShell"
+	"userEnvProbe": "loginInteractiveShell",
+	"postCreateCommand": "npm ci"
 }
