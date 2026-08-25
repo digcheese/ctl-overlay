@@ -23,22 +23,34 @@ const spacedYCoords = (n) => {
 }
 
 const Positions = {
-  DEFAULT_POSITIONS: [
-    spacedYCoords(5).map(e=> ({top: e, left: xPadding})),
-    spacedYCoords(5).map(e=> ({top: e, right: xPadding})),
-  ],
-  BENCH_PLAYER_SELECTED_POSITIONS: [
-    spacedYCoords(4).map(e=> ({top: e, left: xPadding})),
-    spacedYCoords(4).map(e=> ({top: e, right: xPadding})),
-  ],
+  // DEFAULT_POSITIONS: [
+  //   spacedYCoords(5).map(e=> ({top: e, left: xPadding})),
+  //   spacedYCoords(5).map(e=> ({top: e, right: xPadding})),
+  // ],
+  // BENCH_PLAYER_SELECTED_POSITIONS: [
+  //   spacedYCoords(4).map(e=> ({top: e, left: xPadding})),
+  //   spacedYCoords(4).map(e=> ({top: e, right: xPadding})),
+  // ],
+
+  defaultPositions: (n, teamIndex) =>
+    spacedYCoords(n).map(top => teamIndex === 0 ? { top, left: xPadding } : { top, right: xPadding }),
+
+  benchPositionsSelected: (n, teamIndex) =>
+    spacedYCoords(n).map(top => teamIndex === 0 ? { top, left: xPadding } : { top, right: xPadding }),
+
   FOCUSED_PLAYER_SELECTED_POSITIONS: [
     {width: focusedSize, height: focusedSize, top: height / 2 - focusedSize / 2,  left: focusedXPadding},
     {width: focusedSize, height: focusedSize, top: height / 2 - focusedSize / 2, right: focusedXPadding},
   ],
-  BENCH_PLAYER_GAME_POSITIONS: [
-    spacedYCoords(4).map(e=> ({top: e, left: -xPadding - defaultSize})),
-    spacedYCoords(4).map(e=> ({top: e, right: -xPadding - defaultSize})),
-  ],
+  // BENCH_PLAYER_GAME_POSITIONS: [
+  //   spacedYCoords(4).map(e=> ({top: e, left: -xPadding - defaultSize})),
+  //   spacedYCoords(4).map(e=> ({top: e, right: -xPadding - defaultSize})),
+  // ],
+  benchPositionsGame: (n, teamIndex) =>
+    spacedYCoords(n).map(top => teamIndex === 0
+      ? { top, left: -xPadding - defaultSize }
+      : { top, right: -xPadding - defaultSize }),
+
   FOCUSED_PLAYER_GAME_POSITIONS: [
     {width: focusedSize, height: focusedSize, top: height - gameSceneYPadding - focusedSize,  left: gameSceneXPadding},
     {width: focusedSize, height: focusedSize, top: height - gameSceneYPadding - focusedSize,  right: gameSceneXPadding},
